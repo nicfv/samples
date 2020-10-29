@@ -4,6 +4,12 @@ class Hexagon {
     #points = [];
     #z = 0;
 
+    /**
+     * @param x X-coordinate
+     * @param y Y-coordinate
+     * @param z Height
+     * @param r Radius
+     */
     constructor(x, y, z, r) {
         x *= r;
         y *= r;
@@ -13,13 +19,12 @@ class Hexagon {
         }
     }
 
-    get z() { return this.#z; }
-    set z(x) { this.#z = x; }
-
     #getColor() {
         if(this.#z > 0.5) {
+            // Land
             return 'hsl('+(80+this.#z*40)+','+(100-this.#z*40)+'%,'+(60-this.#z*40)+'%)'
         } else {
+            // Water
             return 'hsl('+(200+this.#z*40)+','+(40+this.#z*40)+'%,'+(20+this.#z*40)+'%)'
         }
     }

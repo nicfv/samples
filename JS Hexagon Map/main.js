@@ -1,11 +1,11 @@
 'use strict';
 
-const c = document.getElementById('c');
-
-const m = new MapGen();
+const canvas = document.getElementById('c');
 
 const draw = () => {
-    m.draw(c.getContext('2d'));
+    const map = new MapGen(9, 21);
+    canvas.getContext('2d').clearRect(0, 0, canvas.clientWidth, canvas.clientHeight);
+    map.draw(canvas.getContext('2d'));
 };
 
 draw();
