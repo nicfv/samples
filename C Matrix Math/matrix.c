@@ -172,7 +172,7 @@ Matrix matrix_transpose(Matrix k) {
 
 double matrix_det(Matrix k) {
     Matrix smaller;
-    int i, i_from, i_to, j;
+    int i, i_src, i_dest, j;
     double d = 0;
     assert(k.rows == k.cols);
     if(k.rows == 1) {
@@ -181,15 +181,15 @@ double matrix_det(Matrix k) {
         // Use the sum of the determinants from the first column
         for(i = 0; i < k.rows; i++) {
             smaller = matrix_zeroes(k.rows-1, k.cols-1);
-            i_to = 0;
-            for(i_from = 0; i_from < k.rows; i_from++) {
-                if(i_from == i) {
+            i_dest = 0;
+            for(i_src = 0; i_src < k.rows; i_src++) {
+                if(i_src == i) {
                     continue; // Skip row i
                 }
                 for(j = 1; j < k.cols; j++) {
-                    smaller.mat[i_to][j-1] = k.mat[i_from][j];
+                    smaller.mat[i_dest][j-1] = k.mat[i_src][j];
                 }
-                i_to++;
+                i_dest++;
             }
             d += (i%2 ? -1 : 1) * k.mat[i][0] * matrix_det(smaller);
             matrix_free(&smaller);
@@ -278,32 +278,21 @@ void matrix_solve(Matrix *A, Vector *b) {
         f = 1/A->mat[i_src][j];
         matrix_scale_row(A, i_src, f);
         vector_scale_element(b, i_src, f);
-
-        printf("Multiplying row %d by %lf\n", i_src+1, f);
-        matrix_print(*A); printf("\n");
         // Eliminate all other elements in column j.
         for(i_dest = 0; i_dest < A->rows; i_dest++) {
             if(i_src == i_dest) { continue; }
             f = -A->mat[i_dest][j];
             matrix_add_row(A, i_src, i_dest, f);
             vector_add_element(b, i_src, i_dest, f);
-
-            printf("Adding row %d * %lf to row %d\n", i_src+1, f, i_dest+1);
-            matrix_print(*A); printf("\n");
         }
     }
-    // Order each row based on zeroes.
+    // Order each row based on leading zeroes.
     diagonal_count = 0;
     for(j = 0; j < A->cols; j++) {
         for(i = diagonal_count; i < A->rows; i++) {
             if(!zero(A->mat[i][j])) {
                 matrix_swap_rows(A, i, diagonal_count);
                 vector_swap(b, i, diagonal_count);
-
-
-                printf("Swapping rows %d and %d (%d)\n", i+1, diagonal_count+1, j+1);
-                matrix_print(*A); printf("\n");
-
                 diagonal_count++;
             }
         }
@@ -316,13 +305,14 @@ Matrix matrix_invert(Matrix *k) {
     int i, j, i_src, i_dest, diagonal_count;
     double f;
     Matrix l;
-    assert(k->rows == k->cols);
+    // If the determinant is 0, k cannot be inverted. (Linearly dependent.)
+    assert(!zero(matrix_det(*k)));
     l = matrix_identity(k->rows);
     for(i_src = 0; i_src < k->rows; i_src++) {
         // Find the first nonzero element in row i_src.
+        // There should always be at least 1 nonzero element
+        // in each row because the determinant is not zero.
         for(j = 0; zero(k->mat[i_src][j]) && j < k->cols; j++) {}
-        // Or abort if the row is full of zeroes.
-        assert(j < k->cols);
         // Simplify row i_src.
         f = 1/k->mat[i_src][j];
         matrix_scale_row(k, i_src, f);
@@ -335,7 +325,7 @@ Matrix matrix_invert(Matrix *k) {
             matrix_add_row(&l, i_src, i_dest, f);
         }
     }
-    // Order each row based on zeroes.
+    // Order each row based on leading zeroes.
     diagonal_count = 0;
     for(j = 0; j < k->cols; j++) {
         for(i = diagonal_count; i < k->rows; i++) {
