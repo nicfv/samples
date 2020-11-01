@@ -3,56 +3,67 @@
 #include <assert.h>
 #include <math.h>
 
+#include "matmath.c"
 #include "matrix.h"
 
 int main() {
-    Matrix A, B, C, D, E, F, G;
+    Matrix A, B, C;
+    Vector b;
     double data[] = {2, 0, 1, 1, 0, 1, 2, 3, 0, 2, 3, 0, 1, 2, 0, 3},
-        data2[] = {0, 0, 1, 1, 0, 1, 2, 0, 0, 2, 1, 0, 1, 2, 0, 2};
+        data2[] = {0, 0, 0, -2, 0, 1, 2, 0, 0, 2, 4, 0, 1, 2, 0, 2},
+        data3[] = {1, 2, 4, 6};
     A = matrix(data, 4, 4);
     B = matrix(data2, 4, 4);
-    C = matrix_add(A, B);
-    D = matrix(data2, 2, 8);
-    E = matrix_transpose(D);
-    F = matrix_mult(D, E);
-    G = matrix_mult(E, D);
+    b = vector(data3, 4);
 
     printf("A =\n");
     matrix_print(A);
+    // printf("b =\n");
+    // vector_print(b);
+    // matrix_print_equations(A, b);
 
-    printf("B =\n");
+    B = matrix_invert(&A);
+
+    printf("A' =\n");
+    matrix_print(A);
+    printf("A^-1 =\n");
     matrix_print(B);
+    // matrix_print_equations(A, b);
 
-    printf("A + B = C =\n");
+    A = matrix(data, 4, 4);
+    printf("C =\n");
+    C = matrix_mult(A, B);
     matrix_print(C);
 
-    printf("D =\n");
-    matrix_print(D);
+    // B = matrix_invert(&A);
 
-    printf("D^T = E =\n");
-    matrix_print(E);
+    // printf("A =\n");
+    // matrix_print(A);
 
-    printf("D * D^T = F =\n");
-    matrix_print(F);
+    // printf("B =\n");
+    // matrix_print(B);
 
-    printf("D^T * D = G =\n");
-    matrix_print(G);
+    // printf("C =\n");
+    // vector_print(C);
 
-    printf("\n");
+    // printf("\n\n");
+    // matrix_print_equations(A, C);
+    // printf("\n\n");
 
-    printf("det(A) = %lf\n", matrix_det(A));
-    printf("det(B) = %lf\n", matrix_det(B));
-    printf("det(C) = %lf\n", matrix_det(C));
-    printf("det(F) = %lf\n", matrix_det(F));
-    printf("det(G) = %lf\n", matrix_det(G));
+    // matrix_solve(&A, &C);
+    // printf("\n\n");
+
+    // printf("A =\n");
+    // matrix_print(A);
+    // printf("C =\n");
+    // vector_print(C);
+
+    // printf("\n\n");
+    // matrix_print_equations(A, C);
+    // printf("\n\n");
 
     matrix_free(&A);
     matrix_free(&B);
-    matrix_free(&C);
-    matrix_free(&D);
-    matrix_free(&E);
-    matrix_free(&F);
-    matrix_free(&G);
     
     return 0;
 }

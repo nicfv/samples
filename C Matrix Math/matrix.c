@@ -1,5 +1,4 @@
-// Create a matrix with m rows and n columns.
-Matrix matrix(double* arr, int m, int n) {
+Matrix matrix(double *arr, int m, int n) {
     Matrix k;
     int i, j;
     k = matrix_zeroes(m, n);
@@ -11,25 +10,22 @@ Matrix matrix(double* arr, int m, int n) {
     return k;
 }
 
-// Create an m x m identity matrix.
 Matrix matrix_identity(int m) {
     Matrix k;
-    int i, j;
+    int i;
     k = matrix_zeroes(m, m);
     for(i = 0; i < m; i++) {
-        for(j = 0; j < m; j++) {
-            k.mat[i][j] = (i == j);
-        }
+        k.mat[i][i] = 1;
     }
     return k;
 }
 
-// Create an m x n zero matrix.
 Matrix matrix_zeroes(int m, int n) {
     Matrix k;
     int i;
     assert(m > 0 && n > 0);
-    k.mat = calloc(m, sizeof(double*)); // Creating an array of pointers.
+    // Allocate an array of pointers.
+    k.mat = calloc(m, sizeof(double*));
     for(i = 0; i < m; i++) {
         k.mat[i] = calloc(n, sizeof(double));
     }
@@ -38,7 +34,6 @@ Matrix matrix_zeroes(int m, int n) {
     return k;
 }
 
-// Free the memory allocated by a matrix.
 void matrix_free(Matrix *k) {
     int i;
     if(k->mat) {
@@ -51,7 +46,6 @@ void matrix_free(Matrix *k) {
     }
 }
 
-// Prints the matrix to the debug console.
 void matrix_print(Matrix k) {
     int i, j;
     for(i = 0; i < k.rows; i++) {
@@ -66,17 +60,44 @@ void matrix_print(Matrix k) {
     }
 }
 
-// Multiply each element in the matrix by c.
-void matrix_scale(double c, Matrix *k) {
-    int i, j;
-    for(i = 0; i < k->rows; i++) {
-        for(j = 0; j < k->cols; j++) {
-            k->mat[i][j] *= c;
+void matrix_print_equations(Matrix A, Vector b) {
+    int i, j, terms;
+    double coef;
+    assert(A.rows == b.dim);
+    for(i = 0; i < A.rows; i++) {
+        terms = 0;
+        for(j = 0; j < A.cols; j++) {
+            coef = A.mat[i][j];
+            if(zero(coef)) {
+                if(!terms && j >= A.cols-1) {
+                    printf("0");
+                } else {
+                    continue;
+                }
+            } else {
+                if(terms) {
+                    if(coef > 0) {
+                        printf(" + ");
+                    } else {
+                        printf(" - ");
+                    }
+                } else {
+                    if(coef < 0) {
+                        printf("-");
+                    }
+                }
+                if(zero(absf(coef)-1)) {
+                    printf("x%d", j+1);
+                } else {
+                    printf("%.3lf x%d", absf(coef), j+1);
+                }
+                terms++;
+            }
         }
+        printf(" = %.3lf (%d)\n", b.vec[i], i+1);
     }
 }
 
-// Returns row m of matrix k as a vector.
 Vector matrix_row(Matrix k, int m) {
     Vector v;
     int j;
@@ -89,7 +110,6 @@ Vector matrix_row(Matrix k, int m) {
     return v;
 }
 
-// Returns column n of matrix k as a vector.
 Vector matrix_col(Matrix k, int n) {
     Vector v;
     int i;
@@ -102,7 +122,6 @@ Vector matrix_col(Matrix k, int n) {
     return v;
 }
 
-// Adds two matrices and returns the sum.
 Matrix matrix_add(Matrix k, Matrix l) {
     Matrix s;
     int i, j;
@@ -119,7 +138,6 @@ Matrix matrix_add(Matrix k, Matrix l) {
     return s;
 }
 
-// Multiplies two matrices and returns the product.
 Matrix matrix_mult(Matrix k, Matrix l) {
     Matrix p;
     int i, j;
@@ -140,7 +158,6 @@ Matrix matrix_mult(Matrix k, Matrix l) {
     return p;
 }
 
-// Returns a new matrix with the rows and columns of the matrix k swapped.
 Matrix matrix_transpose(Matrix k) {
     Matrix l;
     int i, j;
@@ -153,7 +170,6 @@ Matrix matrix_transpose(Matrix k) {
     return l;
 }
 
-// Compute the determinant of matrix k.
 double matrix_det(Matrix k) {
     Matrix smaller;
     int i, i_from, i_to, j;
@@ -180,4 +196,155 @@ double matrix_det(Matrix k) {
         }
     }
     return d;
+}
+
+void matrix_swap_rows(Matrix *k, int i1, int i2) {
+    int j;
+    double temp;
+    assert(i1 >= 0 && i2 >= 0 &&
+        i1 < k->rows && i2 < k->rows);
+    for(j = 0; j < k->cols; j++) {
+        temp = k->mat[i1][j];
+        k->mat[i1][j] = k->mat[i2][j];
+        k->mat[i2][j] = temp;
+    }
+}
+
+void matrix_swap_cols(Matrix *k, int j1, int j2) {
+    int i;
+    double temp;
+    assert(j1 >= 0 && j2 >= 0 &&
+        j1 < k->cols && j2 < k->cols);
+    for(i = 0; i < k->rows; i++) {
+        temp = k->mat[i][j1];
+        k->mat[i][j1] = k->mat[i][j2];
+        k->mat[i][j2] = temp;
+    }
+}
+
+void matrix_scale(Matrix *k, double c) {
+    int i, j;
+    for(i = 0; i < k->rows; i++) {
+        for(j = 0; j < k->cols; j++) {
+            k->mat[i][j] *= c;
+        }
+    }
+}
+
+void matrix_scale_row(Matrix *k, int i, double c) {
+    int j;
+    assert(i >= 0 && i < k->rows);
+    for(j = 0; j < k->cols; j++) {
+        k->mat[i][j] *= c;
+    }
+}
+
+void matrix_scale_col(Matrix *k, int j, double c) {
+    int i;
+    assert(j >= 0 && j < k->cols);
+    for(i = 0; i < k->rows; i++) {
+        k->mat[i][j] *= c;
+    }
+}
+
+void matrix_add_row(Matrix *k, int i_src, int i_dest, double f) {
+    int j;
+    assert(i_src >= 0 && i_dest >= 0 &&
+        i_src < k->rows && i_dest < k->rows);
+    for(j = 0; j < k->rows; j++) {
+        k->mat[i_dest][j] += f * k->mat[i_src][j];
+    }
+}
+
+void matrix_add_col(Matrix *k, int j_src, int j_dest, double f) {
+    int i;
+    assert(j_src >= 0 && j_dest >= 0 &&
+        j_src < k->cols && j_dest < k->cols);
+    for(i = 0; i < k->cols; i++) {
+        k->mat[i][j_src] += f * k->mat[i][j_dest];
+    }
+}
+
+void matrix_solve(Matrix *A, Vector *b) {
+    int i, j, i_src, i_dest, diagonal_count;
+    double f;
+    assert(A->rows == b->dim);
+    for(i_src = 0; i_src < A->rows; i_src++) {
+        // Find the first nonzero element in row i_src.
+        for(j = 0; zero(A->mat[i_src][j]) && j < A->cols; j++) {}
+        // Or skip if the row is full of zeroes.
+        if(j >= A->cols) { continue; }
+        // Simplify row i_src.
+        f = 1/A->mat[i_src][j];
+        matrix_scale_row(A, i_src, f);
+        vector_scale_element(b, i_src, f);
+
+        printf("Multiplying row %d by %lf\n", i_src+1, f);
+        matrix_print(*A); printf("\n");
+        // Eliminate all other elements in column j.
+        for(i_dest = 0; i_dest < A->rows; i_dest++) {
+            if(i_src == i_dest) { continue; }
+            f = -A->mat[i_dest][j];
+            matrix_add_row(A, i_src, i_dest, f);
+            vector_add_element(b, i_src, i_dest, f);
+
+            printf("Adding row %d * %lf to row %d\n", i_src+1, f, i_dest+1);
+            matrix_print(*A); printf("\n");
+        }
+    }
+    // Order each row based on zeroes.
+    diagonal_count = 0;
+    for(j = 0; j < A->cols; j++) {
+        for(i = diagonal_count; i < A->rows; i++) {
+            if(!zero(A->mat[i][j])) {
+                matrix_swap_rows(A, i, diagonal_count);
+                vector_swap(b, i, diagonal_count);
+
+
+                printf("Swapping rows %d and %d (%d)\n", i+1, diagonal_count+1, j+1);
+                matrix_print(*A); printf("\n");
+
+                diagonal_count++;
+            }
+        }
+    }
+}
+
+
+
+Matrix matrix_invert(Matrix *k) {
+    int i, j, i_src, i_dest, diagonal_count;
+    double f;
+    Matrix l;
+    assert(k->rows == k->cols);
+    l = matrix_identity(k->rows);
+    for(i_src = 0; i_src < k->rows; i_src++) {
+        // Find the first nonzero element in row i_src.
+        for(j = 0; zero(k->mat[i_src][j]) && j < k->cols; j++) {}
+        // Or abort if the row is full of zeroes.
+        assert(j < k->cols);
+        // Simplify row i_src.
+        f = 1/k->mat[i_src][j];
+        matrix_scale_row(k, i_src, f);
+        matrix_scale_row(&l, i_src, f);
+        // Eliminate all other elements in column j.
+        for(i_dest = 0; i_dest < k->rows; i_dest++) {
+            if(i_src == i_dest) { continue; }
+            f = -k->mat[i_dest][j];
+            matrix_add_row(k, i_src, i_dest, f);
+            matrix_add_row(&l, i_src, i_dest, f);
+        }
+    }
+    // Order each row based on zeroes.
+    diagonal_count = 0;
+    for(j = 0; j < k->cols; j++) {
+        for(i = diagonal_count; i < k->rows; i++) {
+            if(!zero(k->mat[i][j])) {
+                matrix_swap_rows(k, i, diagonal_count);
+                matrix_swap_rows(&l, i, diagonal_count);
+                diagonal_count++;
+            }
+        }
+    }
+    return l;
 }
