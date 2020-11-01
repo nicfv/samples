@@ -13,7 +13,7 @@ class MapGen {
         this.#tiles = [];
         for(let x = 0; x < w; x++) {
             for (let y = 0; y < h; y++) {
-                this.#tiles.push(new Hexagon(x*2*Math.sqrt(3)+(y%2)*Math.sqrt(3), y, Math.random(), 20));
+                this.#tiles.push(new Hexagon((x*2+(y%2))*Math.sqrt(3), y, Math.random(), 20));
             }
         }
     }

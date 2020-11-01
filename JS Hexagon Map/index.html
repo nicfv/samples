@@ -2,12 +2,16 @@
 <html>
     <head>
         <title>Hexagon Map</title>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
         <script src="hex.js"></script>
         <script src="mapgen.js"></script>
     </head>
     <body>
         <canvas id="c" style="background: black;" width="600px" height="400px"></canvas>
         <br>
+        <input type="range" id="percentLand" min="0" max="100" value="50" oninput="updateUi();">
+        <label id="percentLandLabel" for="percentLand">50% land</label><br>
         <button onclick="draw();">Generate New</button>
     </body>
     <script src="main.js"></script>

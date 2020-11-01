@@ -20,9 +20,9 @@ class Hexagon {
     }
 
     #getColor() {
-        if(this.#z > 0.5) {
+        if(this.#z < G.percentLand) {
             // Land
-            return 'hsl('+(80+this.#z*40)+','+(100-this.#z*40)+'%,'+(60-this.#z*40)+'%)'
+            return 'hsl('+(80+this.#z*40)+','+(100-this.#z*40)+'%,'+(40-this.#z*20)+'%)'
         } else {
             // Water
             return 'hsl('+(200+this.#z*40)+','+(40+this.#z*40)+'%,'+(20+this.#z*40)+'%)'
