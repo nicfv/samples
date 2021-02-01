@@ -1,11 +1,17 @@
 # Code samples
-Code samples for DS Volition Team
+> Code samples in C and JavaScript
 
 ## C Matrix Math
-Demonstrates ability to code in C and free memory
+* Memory allocation and freeing
+* Asserts
+* Structures (matrix, vector)
+* Readable code
 
 ## JS Hexagon Map
-Demonstrates ability to design clean and straightforward GUIs
+* Clean GUIs
+* HTML form controls
+* ES6 classes
+* Web-based programming
 
 ## Documents
-Includes an additional copy of my resume and cover letter
+* Shows how to access the latest copy of my resume and cover letter

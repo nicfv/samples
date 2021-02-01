@@ -4,15 +4,19 @@
         <title>Hexagon Map</title>
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
+        <link rel="stylesheet" type="text/css" href="main.css">
         <script src="hex.js"></script>
         <script src="mapgen.js"></script>
     </head>
     <body>
-        <canvas id="c" style="background: black;" width="600px" height="400px"></canvas>
-        <br>
-        <input type="range" id="percentLand" min="0" max="100" value="50" oninput="updateUi();">
-        <label id="percentLandLabel" for="percentLand">50% land</label><br>
-        <button onclick="draw();">Generate New</button>
+        <canvas id="c" style="background: white;" width="600px" height="600px"></canvas>
+        <form action="#">
+            <input type="range" id="percentLand" min="0" max="100" value="50" oninput="updateUi();">
+            <label id="percentLandLabel" for="percentLand">50% land</label><br>
+            <input type="range" id="boardSize" min="1" max="8" value="3" oninput="updateUi();">
+            <label id="boardSizeLabel" for="boardSize">board size 3</label><br>
+            <button onclick="draw();">Generate New</button>
+        </form>
     </body>
     <script src="main.js"></script>
 </html>
